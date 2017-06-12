@@ -6,6 +6,7 @@ SqlFileSendPath="/data/test/"
 mkdir -p /data/test/
 mkdir -p /tmp/syncDBlogs
 mkdir -p /tmp/exportLogs
+cp sqlOperate.py /tmp/exportLogs/
 
 cd /var/log/mysql/
 files=$(ls mysql.log.*.gz 2>/dev/null | wc -l)
