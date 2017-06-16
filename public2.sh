@@ -29,12 +29,19 @@ else echo "刷新日志失败，请检查错误！"
      exit 1
 fi
 
-files=$(ls mysql-bin.0* 2>/dev/null | wc -l)
-if [ $files != '0' ]; then
-    mv mysql-bin.* /tmp/syncDBlogs
+files=`ls mysql-bin.* | grep [0-9]$ 2>/dev/null | wc -l)`
+echo $files
+if [ `expr $files` != 0 ]; then
+fileArr=$(ls mysql-bin.* | grep [0-9]$ | sort)
+num=1
+while [ $num -lt `expr $files` ]; 
+do
+    mv `echo $fileArr | awk '{print $'$num'}'` /tmp/syncDBlogs/;
+    num=`expr $num + 1`;
+done 
 #rm -f mysql-bin.index
 else 
-    echo "没有bin-log文件！"
+    echo "没有可以同步的bin-log文件！"
     exit 1
 fi
 
@@ -57,14 +64,15 @@ if [ expr $file > $FileNum ]; then
 fi
 
 cd /tmp/syncDBlogs/
-rm *.index
+#rm *.index
 
 files2=$(ls mysql-bin.0* 2>/dev/null | wc -l)
 if [ $files2 != '0' ]; then
 #保留log文件并转移到同步目录
+fileTime=`date +%Y%m%d%H%M%S`
 for binName in $( ls mysql-bin.0* |sort )
 do
-    cat $binName >> `date +%Y%m%d%H%M%S`.binlog
+    cat $binName >> $fileTime.binlog
 done
 if [ $? -eq 0 ];then
     mv mysql-bin.* /tmp/exportLogs/

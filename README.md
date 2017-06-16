@@ -23,11 +23,11 @@
 
 ## 从数据库脚本使用说明
 * 设置单导接收路径和从数据库连接信息
-  打开local2.sh,,修改SqlFileSendPath的路径，如设置接收路径为/data/test/,则SqlFileSendPath="/data/test/"
+  打开local2.sh,修改SqlFileSendPath的路径，如设置接收路径为/data/test/,则SqlFileSendPath="/data/test/"
   类似的设置数据库用户DBuser，数据库密码DBpassword和数据库名DBname
   设置完成后保存退出。
 * 运行从机数据库同步脚本 sudo sh local2.sh
 
 注：local2.sh脚本的作用是检测接收同步路径下是否有可同步到数据库的binlog文件，若有，则进行binlog同步操作，并在同步完成后删除此路径下的binlog文件，若没有binlog文件可同步，则什么也不做。
 
-
+## 特别说明:对于主服务器的发送目录下的binlog文件没有作定期清理，原因是无法判断从服务器是否已接收到binlog同步文件并同步成功。
