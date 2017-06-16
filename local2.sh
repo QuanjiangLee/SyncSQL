@@ -34,12 +34,13 @@ touch error.log
 for logName in $( ls *.binlog|sort )
 do
 #mysql --user=$DBuser --password=$DBpassword $DBname < $logName >/dev/null 2>>error.log
-mysqlbinlog --no-defaults logName | mysql --user=$DBuser --password=$DBpassword $DBname >/dev/null 2>>error.log
-done
+mysqlbinlog --no-defaults $logName | mysql --user=$DBuser --password=$DBpassword $DBname >/dev/null 2>>error.log
 
 #同步检测，若同步完成则删除已同步的binlog文件
 if [ $? -eq 0 ];then
-rm -rf /tmp/syncDBlogs/
+rm -rf /tmp/syncDBlogs/$logName
+    echo "同步成功！"
 else 
     echo "同步错误，请检查错误！"
 fi
+done
