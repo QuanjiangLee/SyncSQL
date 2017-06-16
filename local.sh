@@ -26,7 +26,7 @@ touch error.log
 
 for logName in $( ls *.sql|sort )
 do
-mysql --user=$DBuser --password=$DBpassword $DBname < $logName >/dev/null 2>>error.log
+mysql --user=$DBuser --password=$DBpassword --database=$DBname < $logName >/dev/null 2>>error.log
 done
 
 if [ $? -eq 0 ];then
