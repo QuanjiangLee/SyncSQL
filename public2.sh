@@ -12,7 +12,10 @@ DBpassword="li0717"
 #数据库名
 DBname="myDatabase"
 
-mkdir -p /data/test/
+#设置同步文件目录的binlog文件数量
+FileNum=2
+
+mkdir -p $SqlFileSendPath
 mkdir -p /tmp/syncDBlogs
 mkdir -p /tmp/exportLogs
 #cp sqlOperate.py /tmp/exportLogs/
@@ -22,14 +25,13 @@ mysqladmin --user=$DBuser --password=$DBpassword flush-logs
 
 if [ $? -eq 0 ];then
 cd /var/log/mysql/
-else echo "刷新日志失败！"
+else echo "刷新日志失败，请检查错误！"
      exit 1
 fi
 
 files=$(ls mysql-bin.0* 2>/dev/null | wc -l)
 if [ $files != '0' ]; then
-    pwd
-    cp mysql-bin.* /tmp/syncDBlogs
+    mv mysql-bin.* /tmp/syncDBlogs
 #rm -f mysql-bin.index
 else 
     echo "没有bin-log文件！"
@@ -48,17 +50,27 @@ fi
 
 
 files=$(ls $SqlFileSendPath 2>/dev/null | wc -l)
-if [ expr $file > 2 ]; then
-echo "data文件大于零"
+if [ expr $file > $FileNum ]; then
+    echo "data文件大于$FileNum"
 #for binName in $( ls mysql.log.*.gz|sort -r)
 #do
 fi
+
 cd /tmp/syncDBlogs/
-#rm *.index
+rm *.index
+
 files2=$(ls mysql-bin.0* 2>/dev/null | wc -l)
 if [ $files2 != '0' ]; then
 #保留log文件并转移到同步目录
-cp * /tmp/exportLogs/ && mv /tmp/syncDBlogs/* $SqlFileSendPath
+for binName in $( ls mysql-bin.0* |sort )
+do
+    cat $binName >> `date +%Y%m%d%H%M%S`.binlog
+done
+if [ $? -eq 0 ];then
+    mv mysql-bin.* /tmp/exportLogs/
+    cp *.binlog /tmp/exportLogs/ && mv /tmp/syncDBlogs/*.binlog  $SqlFileSendPath
+    echo "binlog 已成功处理并移到发送同步目录"
+fi
 fi
 
 
