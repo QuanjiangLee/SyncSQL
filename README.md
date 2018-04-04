@@ -2,6 +2,7 @@
 ## 主数据库脚本使用说明
 * 开启主数据库binlog服务：
   在外网服务器的数据库配置文件中添加以下配置：
+  ```
   [mysqld]
     server-id               = 1
     log_bin                 = /var/log/mysql/mysql-bin
@@ -9,6 +10,7 @@
     expire_logs_days        = 10
     max_binlog_size         = 10M
     binlog_format           = mixed
+  ```
   然后使用systemctl restart mysql 重启数据库,此时ls /var/log/mysql/
   可查看到 mysql-bin.00000* 等文件则表示开启binlog成功。
 
